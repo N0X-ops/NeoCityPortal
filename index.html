@@ -1,172 +1,145 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>NEOCITY — N0X Terminal</title>
-<style>
-:root{
-  --bg:#000;
-  --green:#00ff8c;
-  --mono: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
-}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;background:#000;color:var(--green);font-family:var(--mono);-webkit-font-smoothing:antialiased}
-.canvas-wrap{position:fixed;inset:0;pointer-events:none;z-index:0}
-.container{position:relative;z-index:2;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-.card{width:min(980px,96%);background:linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.72));border:1px solid rgba(0,255,140,0.06);border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.8);display:flex;gap:18px}
-.left{flex:0 0 46%;padding:28px;background:linear-gradient(180deg, rgba(0,0,0,0.1), rgba(0,0,0,0.2))}
-.right{flex:1;padding:28px}
-h1{margin:0;font-size:28px;letter-spacing:2px;color:var(--green)}
-.logo{display:flex;align-items:center;gap:12px;margin-bottom:10px}
-.mark{width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,#002b00,#00ff8c);display:grid;place-items:center;color:#001;border:0;font-weight:900}
-.lead{color:rgba(0,255,140,0.95);margin-top:10px;line-height:1.4}
-.terminal{margin-top:16px;background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;border:1px solid rgba(0,255,140,0.03);min-height:160px;overflow:auto;font-size:13px;color:var(--green)}
-.small{font-size:12px;color:rgba(0,255,140,0.6)}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;background:linear-gradient(90deg, rgba(0,255,140,0.12), rgba(0,255,140,0.02));border:1px solid rgba(0,255,140,0.06);color:var(--green);cursor:pointer;font-weight:700}
-.footer{padding:12px 18px;background:linear-gradient(180deg, rgba(0,0,0,0.2), rgba(0,0,0,0.28));display:flex;justify-content:space-between;align-items:center;color:rgba(0,255,140,0.7)}
-.meta{font-size:13px;color:rgba(0,255,140,0.6)}
-
-/* matrix canvas occupies background */
-.canvas{position:fixed;inset:0;z-index:1;opacity:0.18;}
-
-/* responsive */
-@media (max-width:820px){.card{flex-direction:column}.left{flex-basis:auto;width:100%}.right{width:100%}}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeoCity Access Terminal</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #000;
+      color: #00ffff;
+      font-family: 'Courier New', monospace;
+      overflow: hidden;
+    }
+    .screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+    .glitch {
+      font-size: 2em;
+      color: #0ff;
+      text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 20px #0ff;
+      animation: flicker 1.5s infinite alternate;
+    }
+    @keyframes flicker {
+      0% { opacity: 1; }
+      50% { opacity: 0.8; }
+      100% { opacity: 1; }
+    }
+    input {
+      background: transparent;
+      border: 1px solid #0ff;
+      color: #0ff;
+      padding: 10px;
+      margin-top: 20px;
+      outline: none;
+      text-align: center;
+    }
+    button {
+      background: none;
+      border: 1px solid #0ff;
+      color: #0ff;
+      padding: 10px 20px;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #0ff;
+      color: #000;
+      box-shadow: 0 0 20px #0ff;
+    }
+    .hidden {
+      display: none;
+    }
+    .terminal-text {
+      font-size: 1.2em;
+      margin-top: 20px;
+      white-space: pre-line;
+    }
+    .missions-btn {
+      margin-top: 25px;
+      padding: 12px 24px;
+      border: 2px solid #00ffff;
+      background: none;
+      color: #00ffff;
+      text-decoration: none;
+      transition: 0.3s;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+    .missions-btn:hover {
+      background: #00ffff;
+      color: #000;
+      box-shadow: 0 0 20px #00ffff;
+    }
+  </style>
 </head>
 <body>
-<canvas id="matrix" class="canvas"></canvas>
-<div class="container">
-  <div class="card">
-    <div class="left">
-      <div class="logo"><div class="mark">N</div><div><div style="font-weight:900">NEOCITY</div><div class="small">LIFE IS A GAME — N0X</div></div></div>
-      <h1>N0X ACCESS TERMINAL</h1>
-      <p class="lead">You are entering the undernet. Identity: <strong>N0X</strong>. This interface is a covert entry node to NeoCity — proceed with purpose.</p>
-
-      <div class="terminal" id="terminal">
-        <div>[BOOT] initializing hardware hooks...</div>
-        <div>[CORE] loading shadow modules...</div>
-      </div>
-
-      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
-        <button id="enterBtn" class="btn">ENTER NEOCITY</button>
-        <button id="muteBtn" class="btn">🔇 mute</button>
-      </div>
-    </div>
-
-    <div class="right">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div>
-          <div class="meta">System Console • Underground Node</div>
-          <h1 style="font-size:20px;margin-top:8px">Operator N0X</h1>
-        </div>
-        <div style="text-align:right">
-          <div class="meta">Season: Awakening</div>
-          <div class="meta" id="players">Citizens online: 1</div>
-        </div>
-      </div>
-
-      <div style="margin-top:18px">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div style="background:rgba(0,0,0,0.25);padding:12px;border-radius:8px;border:1px solid rgba(0,255,140,0.03)">
-            <div class="small">Active Missions</div>
-            <div style="margin-top:8px">• Awakening — introduce N0X<br>• Digital Hustle — secure 100₽</div>
-          </div>
-          <div style="background:rgba(0,0,0,0.25);padding:12px;border-radius:8px;border:1px solid rgba(0,255,140,0.03)">
-            <div class="small">Top Citizens</div>
-            <div style="margin-top:8px">— No legends yet —</div>
-          </div>
-        </div>
-
-        <div style="margin-top:12px;background:linear-gradient(90deg, rgba(0,255,140,0.03), rgba(0,255,140,0.01));padding:12px;border-radius:8px;border:1px solid rgba(0,255,140,0.02)">
-          <div class="small">Quick</div>
-          <div style="margin-top:6px">Invite friends • Complete missions • Earn NeoCredits</div>
-        </div>
-      </div>
-    </div>
+  <div class="screen" id="access-screen">
+    <div class="glitch">NEOCITY ACCESS TERMINAL</div>
+    <input type="text" id="username" placeholder="Enter your handle..." />
+    <button onclick="grantAccess()">ENTER</button>
   </div>
-</div>
 
-<div style="position:fixed;bottom:12px;left:12px;color:rgba(0,255,140,0.6);font-size:12px">NeoCity © 2099 — N0X</div>
-<div style="position:fixed;bottom:12px;right:12px"><button id="share" class="btn" style="background:transparent;border:1px solid rgba(0,255,140,0.06)">Share</button></div>
+  <div class="screen hidden" id="main-screen">
+    <div class="glitch">ACCESS GRANTED</div>
+    <div class="terminal-text" id="terminal"></div>
+    <button id="tgLink">Enter NeoCity Telegram</button>
+    <a href="missions.html" class="missions-btn">Enter the System</a>
+  </div>
 
-<script>
-// Matrix background
-const canvas = document.getElementById('matrix');
-const ctx = canvas.getContext('2d');
-let w = canvas.width = innerWidth;
-let h = canvas.height = innerHeight;
-const cols = Math.floor(w / 20) + 1;
-const ypos = Array(cols).fill(0);
-function matrixTick(){
-  ctx.fillStyle = 'rgba(0,0,0,0.12)';
-  ctx.fillRect(0,0,w,h);
-  ctx.fillStyle = '#00ff8c';
-  ctx.font = '16px monospace';
-  ypos.forEach((y, idx) => {
-    const text = String.fromCharCode(33 + Math.random()*94);
-    const x = idx * 20;
-    ctx.fillText(text, x, y);
-    if(y > 100 + Math.random()*10000) ypos[idx] = 0; else ypos[idx] = y + 20;
-  });
-}
-setInterval(matrixTick, 45);
-addEventListener('resize', ()=>{ w=canvas.width=innerWidth; h=canvas.height=innerHeight; });
+  <script>
+    const accessScreen = document.getElementById('access-screen');
+    const mainScreen = document.getElementById('main-screen');
+    const terminal = document.getElementById('terminal');
+    const tgLink = document.getElementById('tgLink');
 
-// Terminal typing
-const term = document.getElementById('terminal');
-const lines = [
-  '[SYS] Handshake OK.',
-  '[AUTH] Default operator: N0X',
-  '[AUTH] Verifying token...',
-  '[AUTH] Token valid. Access Granted.',
-  '[NET] NeoCity feed online.'
-];
-let li = 0;
-function typeLines(){
-  if(li < lines.length){
-    const d = document.createElement('div');
-    d.textContent = lines[li++];
-    term.appendChild(d);
-    term.scrollTop = term.scrollHeight;
-    setTimeout(typeLines, 900);
-  }
-}
-setTimeout(typeLines, 800);
+    tgLink.onclick = () => {
+      window.open('https://t.me/NeoCity202', '_blank');
+    };
 
-// Buttons
-document.getElementById('enterBtn').onclick = ()=>{
-  window.open('https://t.me/NeoCity202','_blank');
-};
-document.getElementById('share').onclick = ()=>{
-  if(navigator.share) navigator.share({title:'NeoCity — Join N0X', url:location.href}).catch(()=>{});
-  else { navigator.clipboard.writeText(location.href); alert('Link copied'); }
-};
+    function grantAccess() {
+      const username = document.getElementById('username').value.trim();
+      if (!username) return alert('Enter your handle to access NeoCity.');
+      accessScreen.classList.add('hidden');
+      mainScreen.classList.remove('hidden');
+      let messages = [
+        'Initializing CyberLink...\n',
+        'Decrypting access key...\n',
+        'Verifying identity [' + username + ']...\n',
+        'Access Granted. Welcome to NeoCity, ' + username + '.\n\n',
+        '🕶️ Loading system feeds...\n',
+        '⚙️ Synchronizing data streams...\n',
+        '✅ Terminal ready.'
+      ];
+      let index = 0;
+      function type() {
+        if (index < messages.length) {
+          terminal.textContent += messages[index++];
+          setTimeout(type, 800);
+        }
+      }
+      type();
+      playAmbient();
+    }
 
-// Ambient sound (low drone)
-let audioCtx, drone;
-let playing=false;
-const muteBtn = document.getElementById('muteBtn');
-function startDrone(){
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  const gain = audioCtx.createGain();
-  gain.gain.value = 0.03;
-  gain.connect(audioCtx.destination);
-  const o = audioCtx.createOscillator();
-  o.type='sine'; o.frequency.value = 55;
-  const o2 = audioCtx.createOscillator(); o2.type='sine'; o2.frequency.value = 66;
-  const f = audioCtx.createBiquadFilter(); f.type='lowpass'; f.frequency.value = 800;
-  o.connect(f); o2.connect(f); f.connect(gain);
-  o.start(); o2.start();
-  drone = {o,o2,gain,ctx:audioCtx};
-  playing = true;
-  muteBtn.textContent='🔇 mute';
-}
-function stopDrone(){
-  if(drone){ drone.o.stop(); drone.o2.stop(); drone.ctx.close(); drone=null; playing=false; muteBtn.textContent='🔊 sound'; }
-}
-muteBtn.onclick = ()=>{ if(!playing) startDrone(); else stopDrone(); };
-// start muted by default (user can enable)
-</script>
+    function playAmbient() {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.value = 220;
+      gainNode.gain.value = 0.05;
+      oscillator.connect(gainNode).connect(audioCtx.destination);
+      oscillator.start();
+    }
+  </script>
 </body>
 </html>
+
