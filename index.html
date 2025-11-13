@@ -3,189 +3,124 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NeoCity Access Terminal</title>
+  <title>NeoCity — Digital Underground</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;900&display=swap');
+    :root {
+      --bg: #050010;
+      --accent1: #00ffff;
+      --accent2: #ff00cc;
+      --text: #c8e6ff;
+    }
+    * {
+      box-sizing: border-box;
+    }
     body {
       margin: 0;
-      background-color: #000;
-      color: #00ffff;
-      font-family: 'Courier New', monospace;
-      overflow: hidden;
-    }
-    .screen {
+      background: radial-gradient(circle at 30% 20%, rgba(255,0,204,0.1) 0%, transparent 60%), 
+                  radial-gradient(circle at 70% 80%, rgba(0,255,255,0.1) 0%, transparent 60%), 
+                  var(--bg);
+      color: var(--text);
+      font-family: 'Orbitron', sans-serif;
+      height: 100vh;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+    .scanlines {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 2px, transparent 4px);
+      pointer-events: none;
+      z-index: 3;
+    }
+    .container {
       text-align: center;
+      z-index: 2;
+      padding: 20px;
     }
-    .glitch {
-      font-size: 2em;
-      color: #0ff;
-      text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 20px #0ff;
-      animation: flicker 1.5s infinite alternate;
+    h1 {
+      font-size: 3rem;
+      background: linear-gradient(90deg, var(--accent1), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 10px rgba(0,255,255,0.4);
+      margin-bottom: 10px;
     }
-    @keyframes flicker {
-      0% { opacity: 1; }
-      50% { opacity: 0.8; }
-      100% { opacity: 1; }
+    p {
+      font-size: 1rem;
+      color: rgba(200,230,255,0.7);
+      margin-bottom: 40px;
     }
-    input {
-      background: transparent;
-      border: 1px solid #0ff;
-      color: #0ff;
-      padding: 10px;
-      margin-top: 20px;
-      outline: none;
-      text-align: center;
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      align-items: center;
     }
-    button {
-      background: none;
-      border: 1px solid #0ff;
-      color: #0ff;
-      padding: 10px 20px;
-      margin-top: 20px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover {
-      background: #0ff;
-      color: #000;
-      box-shadow: 0 0 20px #0ff;
-    }
-    .hidden { display: none; }
-    .terminal-text {
-      font-size: 1.2em;
-      margin-top: 20px;
-      white-space: pre-line;
-    }
-    .missions-btn {
-      margin-top: 25px;
-      padding: 12px 24px;
-      border: 2px solid #00ffff;
-      background: none;
-      color: #00ffff;
+    a.btn {
+      display: inline-block;
+      padding: 14px 28px;
+      border: 2px solid var(--accent1);
+      color: var(--accent1);
       text-decoration: none;
-      transition: 0.3s;
-      font-weight: bold;
+      font-weight: 600;
       letter-spacing: 2px;
+      transition: 0.3s;
+      border-radius: 10px;
+      min-width: 220px;
+      text-align: center;
     }
-    .missions-btn:hover {
-      background: #00ffff;
-      color: #000;
-      box-shadow: 0 0 20px #00ffff;
+    a.btn:hover {
+      background: var(--accent1);
+      color: var(--bg);
+      box-shadow: 0 0 20px var(--accent1);
     }
-    .flash {
-      animation: flashEffect 0.15s infinite alternate;
+    a.secondary {
+      border-color: var(--accent2);
+      color: var(--accent2);
     }
-    @keyframes flashEffect {
-      from { background-color: #000; }
-      to { background-color: #00ffff; }
+    a.secondary:hover {
+      background: var(--accent2);
+      color: var(--bg);
+      box-shadow: 0 0 20px var(--accent2);
+    }
+    .footer {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+      text-align: center;
+      font-size: 0.9rem;
+      color: rgba(200,230,255,0.4);
+      letter-spacing: 1px;
+    }
+    @keyframes glow {
+      0% { opacity: 1; text-shadow: 0 0 10px var(--accent1); }
+      50% { opacity: 0.8; text-shadow: 0 0 20px var(--accent2); }
+      100% { opacity: 1; text-shadow: 0 0 10px var(--accent1); }
+    }
+    .subtitle {
+      font-size: 1.1rem;
+      animation: glow 3s infinite alternate;
     }
   </style>
 </head>
 <body>
-  <div class="screen" id="access-screen">
-    <div class="glitch">NEOCITY ACCESS TERMINAL</div>
-    <input type="text" id="username" placeholder="Enter your handle..." />
-    <button onclick="grantAccess()">ENTER</button>
+  <div class="container">
+    <h1>NEOCITY</h1>
+    <div class="subtitle">DIGITAL UNDERGROUND NETWORK</div>
+    <p>Welcome to the cyber-realm of <b>N0X</b>.<br>Access missions, connect with the network, and stay updated.</p>
+    <div class="buttons">
+      <a href="https://t.me/NeoCity202" target="_blank" class="btn">JOIN TELEGRAM</a>
+      <a href="missions.html" class="btn secondary">VIEW MISSIONS</a>
+      <a href="#" class="btn" style="opacity:0.5;cursor:default;">NEWS — coming soon</a>
+    </div>
   </div>
-
-  <div class="screen hidden" id="main-screen">
-    <div class="glitch">ACCESS GRANTED</div>
-    <div class="terminal-text" id="terminal"></div>
-    <button id="tgLink">Enter NeoCity Telegram</button>
-    <a href="missions.html" class="missions-btn">Enter the System</a>
-  </div>
-
-  <div class="screen hidden" id="reconnect-screen">
-    <div class="glitch">Reconnecting to Terminal...</div>
-  </div>
-
-  <script>
-    const accessScreen = document.getElementById('access-screen');
-    const mainScreen = document.getElementById('main-screen');
-    const reconnectScreen = document.getElementById('reconnect-screen');
-    const terminal = document.getElementById('terminal');
-    const tgLink = document.getElementById('tgLink');
-
-    tgLink.onclick = () => {
-      window.open('https://t.me/NeoCity202', '_blank');
-    };
-
-    // если уже есть ник — открываем терминал
-    window.addEventListener('load', () => {
-      const savedUser = localStorage.getItem('neocity_user');
-      const fromReconnect = sessionStorage.getItem('from_reconnect');
-      if (fromReconnect && savedUser) {
-        sessionStorage.removeItem('from_reconnect');
-        reconnectToTerminal(savedUser);
-      } else if (savedUser) {
-        showTerminal(savedUser);
-      }
-    });
-
-    function grantAccess() {
-      const username = document.getElementById('username').value.trim();
-      if (!username) return alert('Enter your handle to access NeoCity.');
-      localStorage.setItem('neocity_user', username);
-      showTerminal(username);
-    }
-
-    function showTerminal(username) {
-      accessScreen.classList.add('hidden');
-      mainScreen.classList.remove('hidden');
-      terminal.textContent = '';
-      let messages = [
-        'Initializing CyberLink...\n',
-        'Decrypting access key...\n',
-        'Verifying identity [' + username + ']...\n',
-        'Access Granted. Welcome to NeoCity, ' + username + '.\n\n',
-        '🕶️ Loading system feeds...\n',
-        '⚙️ Synchronizing data streams...\n',
-        '✅ Terminal ready.'
-      ];
-      let index = 0;
-      function type() {
-        if (index < messages.length) {
-          terminal.textContent += messages[index++];
-          setTimeout(type, 800);
-        }
-      }
-      type();
-      playAmbient();
-    }
-
-    function reconnectToTerminal(username) {
-      document.body.classList.add('flash');
-      reconnectScreen.classList.remove('hidden');
-      setTimeout(() => {
-        document.body.classList.remove('flash');
-        reconnectScreen.classList.add('hidden');
-        showTerminal(username);
-      }, 2500);
-    }
-
-    function playAmbient() {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioCtx.createOscillator();
-      const gainNode = audioCtx.createGain();
-      oscillator.type = 'sine';
-      oscillator.frequency.value = 220;
-      gainNode.gain.value = 0.05;
-      oscillator.connect(gainNode).connect(audioCtx.destination);
-      oscillator.start();
-    }
-
-    // обработка возврата со страницы missions
-    if (document.referrer.includes('missions.html')) {
-      const savedUser = localStorage.getItem('neocity_user');
-      if (savedUser) {
-        sessionStorage.setItem('from_reconnect', true);
-        window.location.reload();
-      }
-    }
-  </script>
+  <div class="scanlines"></div>
+  <div class="footer">© 2099 N0X • NeoCity Portal</div>
 </body>
 </html>
+
